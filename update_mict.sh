@@ -1,0 +1,1 @@
+python -m pip install -U git+https://github.com/jerzydziewierz/mict.git#egg=mict
