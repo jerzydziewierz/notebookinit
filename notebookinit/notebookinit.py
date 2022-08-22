@@ -32,21 +32,23 @@ _available_modules = ""
 # do all the imports here to keep the dev file clean
 
 
-def import_module_to_parent(module_name=None, import_as=None, _available_modules="",  verbose=False):
+def import_module_to_parent(import_from = None, module_name=None, import_as=None, _available_modules="",  verbose=False):
     """
-    import_module(str) - import a module and return it.
+    import_module_to_parent() - import a module and return it.
+    :param import_from: if not None, uses "from X import Y" semantics. Otherwise, it uses "Import X" semantics
     :param module_name: name of the module to import.
-    :param import_as: if not None, import as this name.
+    :param import_as: if not None, adds "as Z" semantics. Otherwise, does nothing.
     :param _available_modules: running list of available modules, string.
     :param verbose: if True, print the module name and the imported module.
-    :return:
+    :return: incremented _available_modules string. if "import_as" is used, the input _available_modules is incremented with "import_as" name; otherwise, it is incremented with `module_name` name.
     """
     import inspect
-    if verbose:
-        print(f'importing {module_name}')
     parent_locals = inspect.currentframe().f_back.f_locals
     parent_globals = inspect.currentframe().f_back.f_globals
-    code_to_exec = f'import {module_name}'
+    if import_from is None:
+        code_to_exec = f'import {module_name}'
+    else:
+        code_to_exec = f'from {import_from} import {module_name}'
     if import_as is not None:
         code_to_exec += f' as {import_as}'
     success = False
@@ -428,8 +430,8 @@ import time
 
 _available_modules += "tau, nan, inf "
 from math import tau
-nan = numpy.nan
-inf = numpy.inf
+from numpy import nan
+from numpy import inf
 
 ipython.magic('load_ext autoreload')
 
@@ -454,6 +456,8 @@ welcome_text += f'Have a productive day!'
 log.info(welcome_text)
 
 del welcome_text
+del _available_modules
+del _available_functions
 
 
 

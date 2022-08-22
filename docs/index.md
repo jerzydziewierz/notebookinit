@@ -37,6 +37,8 @@ This package has **very** heavy dependencies, and this is intentional.
 
 
 `nan` is `numpy.nan`
+`inf` is `numpy.inf`
+`tau` is `math.tau`
 
 `folder_project_root` is current folder, 2 levels up
 `folder_data` is current folder 1 level up + `\data\` 
