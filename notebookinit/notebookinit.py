@@ -95,6 +95,7 @@ def make_log(section_name='unknown', verbose=False):
     """ shortcut to get global program logger with local section name.
     Make the section name 6 characters or less, please.
     :param section_name:
+    :param verbose: if True, print the section name.
     :return:
     """
     _log = logging.getLogger(section_name)
