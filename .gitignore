@@ -6,6 +6,8 @@
 .obsidian/
 venv/
 
+notebookinit.egg-info/
+
 *.egg-info/
 *.egg-info
 *.egg

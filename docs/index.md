@@ -13,7 +13,7 @@ This package has **very** heavy dependencies, and this is intentional.
 
 ## Implemented features
 
-### Imports
+### Imports automatically
 
 * `numpy`
 * `pandas`
@@ -31,6 +31,42 @@ This package has **very** heavy dependencies, and this is intentional.
 * `os`
 * `sys`
 * `time`
+
+### Requires to be available (but does not import)
+
+#### =============== system
+
+* `pqdm`
+* `requests`
+* `bounded-pool-executor`
+* `dill`
+* `mamba`
+* `ipython`
+* `jupyter`
+* `watermark`
+* `mict @ git+https://github.com/jerzydziewierz/mict.git#egg=mict`
+
+#### =============== numerics & hardware accelerators
+
+* `numpy`
+* `xarray`
+* `einops`
+* `jax`
+* `pandas`
+
+* `pycuda`
+
+#### =============== maths&physics
+
+* `sympy`
+* `pint`
+* `uncertainties`
+* `pymc3`
+
+
+# =============== output
+* `plotly`
+* `kaleido`
 
 
 ### Helper constants
