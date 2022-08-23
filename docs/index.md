@@ -28,6 +28,7 @@ This package has **very** heavy dependencies, and this is intentional.
 * `from IPython.display import display, HTML`
 * `from tqdm.auto import tqdm`
 * `from math import tau`
+* `pqdm`
 * `os`
 * `sys`
 * `time`
@@ -36,7 +37,7 @@ This package has **very** heavy dependencies, and this is intentional.
 
 #### =============== system
 
-* `pqdm`
+
 * `requests`
 * `bounded-pool-executor`
 * `dill`
@@ -95,13 +96,16 @@ Single line usage:
 
 if you additionally want a log:
 
-`log=logging.getLogger('<your_region_name>')`
+```python
+log=logging.getLogger('<your_region_name>')
+nnlog('hello.')
+```
 
 ### Programming tools
 
-`class Obsolete(Exception)`
+`class Obsolete(Exception)` - I need that all too often. 
 
-`make_log(section_name="something",...)`
+`make_log(section_name="something",...)` - create a new log section. 
 
 `run_with_shell(command)` - runs a shell command and pipes the output to the logger.
 
@@ -136,12 +140,15 @@ Asks the jupyter kernel to save the notebook, and then asks git to commit the ch
 
 
 `log.info(message)`
+`nnlog(message)`
+`nnlog(message='message', section='here')`
+`nnlog(message='message', log='this specific one', level=None)`
+`nnlog(message='message', level=logging.FATAL)`
 
 ### Internal functions
 
 `get_notebook_name()` 
 `get_notebook_name2()` 
-
 
 
 ### Recommended but ommited
@@ -163,7 +170,7 @@ I do not normally use it; Rich works best for console apps, and for jupyter it's
 
 ## Installation
 
-Install straight from github:
+Author's preffered method is to install straight from github:
 
 ```bash
 python -m pip \
@@ -178,9 +185,11 @@ To uninstall, a symmetric command is:
 python -m pip uninstall notebookinit
 ```
 
-For a development mode editable local installation, clone the files from the repo to your favourite folder, and then, from inside the root folder of the repo (where the `setup.py` is )
+For a development mode editable local installation, 
+clone the files from the repo to your favourite folder. 
+From the inside of the root folder of the repo 
+(where the `setup.py` is ) issue:
 
 ```bash
 python -m pip -e .
 ```
-
