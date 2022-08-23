@@ -27,18 +27,18 @@ python -m pip install kaleido chevron
 python -m pip install pqdm bounded-pool-executor
 
 """
-_available_functions = ""
-_available_modules = ""
+help_msg = ""
 # do all the imports here to keep the dev file clean
 
 
-def import_module_to_parent(import_from = None, module_name=None, import_as=None, _available_modules="",  verbose=False):
+def bring(import_from=None, module_name=None, import_as=None, help_msg="", verbose=False):
     """
-    import_module_to_parent() - import a module and return it.
+    Import a module or a function from a module, to the caller's frame.
+
     :param import_from: if not None, uses "from X import Y" semantics. Otherwise, it uses "Import X" semantics
     :param module_name: name of the module to import.
     :param import_as: if not None, adds "as Z" semantics. Otherwise, does nothing.
-    :param _available_modules: running list of available modules, string.
+    :param help_msg: running list of available modules, string.
     :param verbose: if True, print the module name and the imported module.
     :return: incremented _available_modules string. if "import_as" is used, the input _available_modules is incremented with "import_as" name; otherwise, it is incremented with `module_name` name.
     """
@@ -62,11 +62,11 @@ def import_module_to_parent(import_from = None, module_name=None, import_as=None
         else:
             pass
     if import_as is not None:
-        _available_modules += f'{import_as} '
+        help_msg += f'{import_as} '
     else:
-        _available_modules += f'{module_name} '
+        help_msg += f'{module_name} '
 
-    return _available_modules
+    return help_msg
 
 
 # ==================================== start with the logger
@@ -77,7 +77,7 @@ ipython = IPython.get_ipython()
 
 from pandas import Timestamp
 now = Timestamp.now()
-_available_functions += "now "
+help_msg += "now "
 
 # %(created)f - # that makes an unix epoch time
 log_fmt = '%(asctime)s | %(name)-6s | %(levelname)-5s | > %(message)s'
@@ -107,7 +107,7 @@ def make_log(section_name='unknown', verbose=False):
     return _log
 
 
-_available_functions += "nnlog "
+help_msg += "nnlog "
 
 
 def nnlog(message='message unset', section=None, log=None, level=None):
@@ -139,7 +139,7 @@ del console
 del formatter
 del log_fmt
 
-_available_functions += "Obsolete "
+help_msg += "Obsolete "
 
 
 class Obsolete(Exception):
@@ -158,7 +158,7 @@ class Obsolete(Exception):
     pass
 
 
-_available_functions += "print_watermark "
+help_msg += "print_watermark "
 
 
 def print_watermark():
@@ -175,11 +175,11 @@ def print_watermark():
         updated=True, current_time=True, current_date=True, timezone=True, iso8601=True))
 
 
-_available_functions += "make_log  "
+help_msg += "make_log  "
 
 
 # auxiliary tools
-_available_functions += "run_with_shell "
+help_msg += "run_with_shell "
 
 
 def run_with_shell(command):
@@ -191,7 +191,7 @@ def run_with_shell(command):
     return log.info(command + ' :says: ' + os.popen(command).read())
 
 
-_available_functions += "add_path "
+help_msg += "add_path "
 
 def add_path(new_lib_path=None, verbose=False):
     """
@@ -204,7 +204,7 @@ def add_path(new_lib_path=None, verbose=False):
         print(sys.path)
 
 
-_available_functions += "px_show "
+help_msg += "px_show "
 
 
 def px_show(hf, width=980, height=360, fname=None, file=None):
@@ -225,7 +225,7 @@ def px_show(hf, width=980, height=360, fname=None, file=None):
         hf.write_image(file=fname, width=width, height=height)
 
 
-_available_functions += "px_describe "
+help_msg += "px_describe "
 
 
 def px_describe(hf=None,
@@ -271,7 +271,7 @@ def px_describe(hf=None,
     return hf
 
 
-_available_functions += "px_axis_equal "
+help_msg += "px_axis_equal "
 
 
 def px_axis_equal(hf):
@@ -335,7 +335,7 @@ def get_notebook_name2():
 
 
 def save_notebook(notebook_name=None,
-                  git_message='no message'):
+                  git_message=None):
     import time
     import IPython
     import hashlib
@@ -361,25 +361,27 @@ def save_notebook(notebook_name=None,
         print('save and pray...')
         IPython.display.display(IPython.display.Javascript('IPython.notebook.save_checkpoint();'))
 
-    run_with_shell('git add .')
-    run_with_shell(f'git commit -a -m "{git_message}"')
-    run_with_shell('git push')
+    if git_message is not None:
+        run_with_shell(f'nbdev_clean --clear_all --fname {nb_full_path}')
+        run_with_shell('git add .')
+        run_with_shell(f'git commit -a -m "{git_message}"')
+        run_with_shell('git push')
 
 
 log = make_log('notebookinit')
 
 # ====================================  add project root to path
-_available_functions += "Path "
+help_msg += "Path "
 from pathlib import Path
 
 import os
 import sys
 import warnings
 
-_available_functions += "warn "
+help_msg += "warn "
 from warnings import warn
 
-_available_functions += "mict "
+help_msg += "mict "
 from mict import mict
 
 # log.info(f'NOT adding {folder_project_root=} to path')
@@ -395,14 +397,14 @@ from mict import mict
 # passwords = mict(dotenv.dotenv_values())
 
 # ====================================  data science tools
-_available_modules = import_module_to_parent(module_name='numpy', _available_modules=_available_modules)
-_available_modules = import_module_to_parent(module_name='plotly', _available_modules=_available_modules)
-_available_modules = import_module_to_parent(module_name='plotly.express', import_as='px', _available_modules=_available_modules)
-_available_modules = import_module_to_parent(module_name='plotly.graph_objects', import_as='go', _available_modules=_available_modules)
-_available_modules = import_module_to_parent(module_name='pandas', _available_modules=_available_modules)
-_available_modules = import_module_to_parent(module_name='json', _available_modules=_available_modules)
-_available_modules = import_module_to_parent(module_name='pint', _available_modules=_available_modules)
-_available_modules = import_module_to_parent(module_name='uncertanities', _available_modules=_available_modules)
+help_msg = bring(module_name='numpy', help_msg=help_msg)
+help_msg = bring(module_name='plotly', help_msg=help_msg)
+help_msg = bring(module_name='plotly.express', import_as='px', help_msg=help_msg)
+help_msg = bring(module_name='plotly.graph_objects', import_as='go', help_msg=help_msg)
+help_msg = bring(module_name='pandas', help_msg=help_msg)
+help_msg = bring(module_name='json', help_msg=help_msg)
+help_msg = bring(module_name='pint', help_msg=help_msg)
+help_msg = bring(module_name='uncertanities', help_msg=help_msg)
 
 
 try:
@@ -412,24 +414,24 @@ try:
     jax.config.update('jax_enable_x64', True)
     jax.config.update('jax_default_dtype_bits', 32)
     jax.numpy.arange(10)
-    _available_modules += "jax, "
+    help_msg += "jax, "
 except ImportError:
     pass
 
 try:
     import chevron
-    _available_modules += "chevron, "
+    help_msg += "chevron, "
 except ImportError:
     pass
 
 from IPython.display import display, HTML
 
 
-_available_functions += "tqdm "
+help_msg += "tqdm "
 from tqdm.auto import tqdm
 import time
 
-_available_modules += "tau, nan, inf "
+help_msg += "tau, nan, inf "
 from math import tau
 from numpy import nan
 from numpy import inf
@@ -452,13 +454,12 @@ welcome_text = f''
 welcome_text += f''
 # welcome_text += f'{folder_project_root=}\n{folder_data=}\n{folder_reports=}\n{folder_cache=}\n'
 welcome_text += f'{folder_project_root=}\n'
-welcome_text += f'{_available_functions} {_available_modules}\n'
+welcome_text += f'{help_msg}\n'
 welcome_text += f'Have a productive day!'
 log.info(welcome_text)
 
 del welcome_text
-del _available_modules
-del _available_functions
+del help_msg
 
 
 
