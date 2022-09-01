@@ -76,7 +76,7 @@ import IPython
 ipython = IPython.get_ipython()
 
 from pandas import Timestamp
-now = Timestamp.now()
+now = Timestamp.now
 help_msg += "now "
 
 # %(created)f - # that makes an unix epoch time
