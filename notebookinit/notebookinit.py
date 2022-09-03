@@ -391,10 +391,8 @@ from mict import mict
 # import urllib3
 
 # urllib3.disable_warnings()
-# import dotenv
-#
-# dotenv.load_dotenv()  # take environment variables from .env.
-# passwords = mict(dotenv.dotenv_values())
+
+
 
 # ====================================  data science tools
 help_msg = bring(module_name='numpy', help_msg=help_msg)
@@ -436,7 +434,12 @@ from math import tau
 from numpy import nan
 from numpy import inf
 
-ipython.magic('load_ext autoreload')
+# note that this will not work when not-in-jupyter
+try:
+    ipython.magic('load_ext autoreload')
+except Exception:
+    print('possibly non-jupyter env detected.')
+
 
 # ====================================  project folders setup
 
@@ -449,6 +452,13 @@ folder_data = Path(os.getcwd() + '/../data/').resolve().__str__()
 Path(folder_data).mkdir(parents=True, exist_ok=True)
 # Path(folder_reports).mkdir(parents=True, exist_ok=True)
 # Path(folder_cache).mkdir(parents=True, exist_ok=True)
+
+import dotenv
+#
+dotenv.load_dotenv()  # take environment variables from .env.
+passwords = mict(dotenv.dotenv_values())
+if len(passwords) > 0:
+    help_msg += f"passwords={len(passwords)}; "
 
 welcome_text = f''
 welcome_text += f''
