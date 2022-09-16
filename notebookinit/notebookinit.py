@@ -81,7 +81,6 @@ help_msg += "now "
 
 # %(created)f - # that makes an unix epoch time
 log_fmt = '%(asctime)s | %(name)-6s | %(levelname)-5s | > %(message)s'
-
 logging.basicConfig(level=logging.INFO, format=log_fmt, filename=f'log_{Timestamp.utcnow().isoformat()[0:13]}.log',
                     filemode='a')  # ,datefmt="%Y-%m-%dT%H:%M:%S%z"
 
@@ -373,7 +372,8 @@ log = make_log('notebookinit')
 # ====================================  add project root to path
 help_msg += "Path "
 from pathlib import Path
-
+Path('log').mkdir(parents=True,exist_ok=True)
+log = make_log('notebookinit')
 import os
 import sys
 import warnings
@@ -392,8 +392,6 @@ from mict import mict
 
 # urllib3.disable_warnings()
 
-
-
 # ====================================  data science tools
 help_msg = bring(module_name='numpy', help_msg=help_msg)
 help_msg = bring(module_name='plotly', help_msg=help_msg)
@@ -403,6 +401,7 @@ help_msg = bring(module_name='pandas', help_msg=help_msg)
 help_msg = bring(module_name='json', help_msg=help_msg)
 help_msg = bring(module_name='pint', help_msg=help_msg)
 help_msg = bring(module_name='uncertanities', help_msg=help_msg)
+help_msg = bring(module_name='pydantic', help_msg=help_msg)
 
 
 try:

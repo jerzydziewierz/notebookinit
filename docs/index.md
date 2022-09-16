@@ -151,6 +151,7 @@ Asks the jupyter kernel to save the notebook, and then asks git to commit the ch
 `get_notebook_name2()` 
 
 
+
 ### Recommended but ommited
 
 If you want to show off, you can add rich:
