@@ -187,7 +187,9 @@ def run_with_shell(command):
     :param command:  string of shell command to run.
     :return: nothing??
     """
-    return log.info(command + ' :says: ' + os.popen(command).read())
+    result = os.popen(command).read()
+    # log.info(command + ' :says: ' + result)
+    return result
 
 
 help_msg += "add_path "
@@ -372,7 +374,7 @@ log = make_log('notebookinit')
 # ====================================  add project root to path
 help_msg += "Path "
 from pathlib import Path
-Path('log').mkdir(parents=True,exist_ok=True)
+Path('log').mkdir(parents=True, exist_ok=True)
 log = make_log('notebookinit')
 import os
 import sys
