@@ -30,6 +30,25 @@ python -m pip install pqdm bounded-pool-executor
 help_msg = ""
 # do all the imports here to keep the dev file clean
 
+# ====================================  project folders setup
+help_msg += "Path "
+from pathlib import Path
+import os
+import sys
+import warnings
+
+
+folder_project_root = str(Path(os.getcwd()).joinpath('../').resolve())
+folder_data = Path(os.getcwd() + '/../data/').resolve().__str__()
+folder_log = str(Path(folder_project_root).joinpath('log').resolve())
+Path(folder_log).mkdir(parents=True, exist_ok=True)
+# folder_reports = Path(os.getcwd() + '/../reports/raw/').resolve().__str__()
+# folder_cache = Path(os.getcwd() + '/../data/cache/').resolve().__str__()
+#
+#
+Path(folder_data).mkdir(parents=True, exist_ok=True)
+# Path(folder_reports).mkdir(parents=True, exist_ok=True)
+# Path(folder_cache).mkdir(parents=True, exist_ok=True)
 
 def bring(import_from=None, module_name=None, import_as=None, help_msg="", verbose=False):
     """
@@ -81,7 +100,7 @@ help_msg += "now "
 
 # %(created)f - # that makes an unix epoch time
 log_fmt = '%(asctime)s | %(name)-6s | %(levelname)-5s | > %(message)s'
-logging.basicConfig(level=logging.INFO, format=log_fmt, filename=f'log_{Timestamp.utcnow().isoformat()[0:13]}.log',
+logging.basicConfig(level=logging.INFO, format=log_fmt, filename=f'{folder_log}/log_{Timestamp.utcnow().isoformat()[0:13]}.log',
                     filemode='a')  # ,datefmt="%Y-%m-%dT%H:%M:%S%z"
 
 console = logging.StreamHandler()
@@ -109,29 +128,30 @@ def make_log(section_name='unknown', verbose=False):
 help_msg += "nnlog "
 
 
-def nnlog(message='message unset', section=None, log=None, level=None):
+def nnlog(message='message unset', section=None, log=None, level=None, execute=True):
     """
     Shortcut: conditional logging
     :param message: message to log. If None, will say "message unset"
     :param section: section to log to. if None, will get the caller's name.
     :param log: log to this logger. if None, will make new logger.
     :param level: log level. if None, will use logging.DEBUG (which is quite low)
+    :param execute: if false, do nothing. default true.
     :return: nothing.
     """
+    if execute:
+        if section is None:
+            import inspect
+            section = inspect.stack()[1][3]
 
-    if section is None:
-        import inspect
-        section = inspect.stack()[1][3]
+        if log is None:
+            _log = make_log(section_name=section)
+        else:
+            _log = log
 
-    if log is None:
-        _log = make_log(section_name=section)
-    else:
-        _log = log
-
-    if _log is not None:
-        if level is None:
-            level = logging.DEBUG
-        _log.log(level, message)
+        if _log is not None:
+            if level is None:
+                level = logging.DEBUG
+            _log.log(level, message)
 
 
 del console
@@ -372,13 +392,9 @@ def save_notebook(notebook_name=None,
 log = make_log('notebookinit')
 
 # ====================================  add project root to path
-help_msg += "Path "
-from pathlib import Path
+
 Path('log').mkdir(parents=True, exist_ok=True)
 log = make_log('notebookinit')
-import os
-import sys
-import warnings
 
 help_msg += "warn "
 from warnings import warn
@@ -442,17 +458,7 @@ except Exception:
     print('possibly non-jupyter env detected.')
 
 
-# ====================================  project folders setup
 
-folder_project_root = str(Path(os.getcwd()).joinpath('../').resolve())
-folder_data = Path(os.getcwd() + '/../data/').resolve().__str__()
-# folder_reports = Path(os.getcwd() + '/../reports/raw/').resolve().__str__()
-# folder_cache = Path(os.getcwd() + '/../data/cache/').resolve().__str__()
-#
-#
-Path(folder_data).mkdir(parents=True, exist_ok=True)
-# Path(folder_reports).mkdir(parents=True, exist_ok=True)
-# Path(folder_cache).mkdir(parents=True, exist_ok=True)
 
 import dotenv
 #
@@ -464,7 +470,7 @@ if len(passwords) > 0:
 welcome_text = f''
 welcome_text += f''
 # welcome_text += f'{folder_project_root=}\n{folder_data=}\n{folder_reports=}\n{folder_cache=}\n'
-welcome_text += f'{folder_project_root=}\n'
+welcome_text += f'folder_project_root={folder_project_root}\n'
 welcome_text += f'{help_msg}\n'
 welcome_text += f'Have a productive day!'
 log.info(welcome_text)
