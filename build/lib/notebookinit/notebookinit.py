@@ -200,7 +200,7 @@ def add_path(new_lib_path=None, verbose=False):
     """
     if new_lib_path is not None:
         if new_lib_path not in sys.path:
-            sys.path.append(str(new_lib_path))
+            sys.path.append(new_lib_path)
     if verbose:
         print(sys.path)
 
@@ -363,12 +363,10 @@ def save_notebook(notebook_name=None,
         IPython.display.display(IPython.display.Javascript('IPython.notebook.save_checkpoint();'))
 
     if git_message is not None:
-        log.info(f'commiting with git...')
         run_with_shell(f'nbdev_clean --clear_all --fname {nb_full_path}')
         run_with_shell('git add .')
         run_with_shell(f'git commit -a -m "{git_message}"')
         run_with_shell('git push')
-        log.info('git push done')
 
 
 log = make_log('notebookinit')
