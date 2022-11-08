@@ -5,28 +5,17 @@ imports logging, numpy, pandas, e.t.c.
 
 usage:
 
-from std_init import *
+from notebookinit import *
 log=logging.getLogger('<your_region_name>')
 
-# then at the end (to be ran after "run all")
+# then at the end (to be run after "run all")
 
 print_watermark()
 save_notebook()
 
 """
 
-"""
-# install requirements:
 
-conda install -y mamba 
-alias mambao="mamba install --use-index-cache -y --channel conda-forge"
-python -m pip install -U git+https://github.com/jerzydziewierz/mict.git#egg=mict
-mambao jupyter ipython plotly numpy pandas cryptography jax python-kaleido tqdm watermark pymc3
-python -m pip install kaleido chevron
-# multiprocessing: 
-python -m pip install pqdm bounded-pool-executor
-
-"""
 help_msg = ""
 # do all the imports here to keep the dev file clean
 
@@ -50,42 +39,8 @@ Path(folder_data).mkdir(parents=True, exist_ok=True)
 # Path(folder_reports).mkdir(parents=True, exist_ok=True)
 # Path(folder_cache).mkdir(parents=True, exist_ok=True)
 
-def bring(import_from=None, module_name=None, import_as=None, help_msg="", verbose=False):
-    """
-    Import a module or a function from a module, to the caller's frame.
+from .bring import bring
 
-    :param import_from: if not None, uses "from X import Y" semantics. Otherwise, it uses "Import X" semantics
-    :param module_name: name of the module to import.
-    :param import_as: if not None, adds "as Z" semantics. Otherwise, does nothing.
-    :param help_msg: running list of available modules, string.
-    :param verbose: if True, print the module name and the imported module.
-    :return: incremented _available_modules string. if "import_as" is used, the input _available_modules is incremented with "import_as" name; otherwise, it is incremented with `module_name` name.
-    """
-    import inspect
-    parent_locals = inspect.currentframe().f_back.f_locals
-    parent_globals = inspect.currentframe().f_back.f_globals
-    if import_from is None:
-        code_to_exec = f'import {module_name}'
-    else:
-        code_to_exec = f'from {import_from} import {module_name}'
-    if import_as is not None:
-        code_to_exec += f' as {import_as}'
-    success = False
-    try:
-        exec(code_to_exec, parent_globals, parent_locals)
-        success = True
-    except Exception as e:
-        if verbose:
-            print(f'failed to import {module_name}')
-            print(e)
-        else:
-            pass
-    if import_as is not None:
-        help_msg += f'{import_as} '
-    else:
-        help_msg += f'{module_name} '
-
-    return help_msg
 
 
 # ==================================== start with the logger
@@ -158,23 +113,7 @@ del console
 del formatter
 del log_fmt
 
-help_msg += "Obsolete "
-
-
-class Obsolete(Exception):
-    def __init__(self, use_instead=None):
-        import inspect
-        caller = inspect.stack()[1]
-        caller_fn_name = caller.function
-        caller_file = caller.filename
-        # print(caller)
-        if use_instead is not None:
-            message = f"function >>{caller_fn_name}<< from {caller_file} is obsolete. Use {use_instead} instead."
-        else:
-            message = f">{caller_fn_name}< from {caller_file} is obsolete."
-        super().__init__(message)
-
-    pass
+bring(import_from='notebookinit.obsolete', module_name='Obsolete', help_msg=help_msg, verbose=False)
 
 
 help_msg += "print_watermark "
@@ -355,7 +294,7 @@ def get_notebook_name2():
                     relative_path = nn['notebook']['path']
                     return os.path.join(ss['notebook_dir'], relative_path)
     except RuntimeError as e:
-        warnings.warn(e)
+        warnings.warn(e.args[0])
         return None
 
 
@@ -426,6 +365,7 @@ help_msg = bring(module_name='json', help_msg=help_msg)
 help_msg = bring(module_name='pint', help_msg=help_msg)
 help_msg = bring(module_name='uncertanities', help_msg=help_msg)
 help_msg = bring(module_name='pydantic', help_msg=help_msg)
+help_msg = bring(import_from='retry', module_name='retry', help_msg=help_msg)
 
 
 try:
@@ -448,14 +388,12 @@ except ImportError:
 from IPython.display import display, HTML
 
 
-help_msg += "tqdm "
-from tqdm.auto import tqdm
-import time
-
-help_msg += "tau, nan, inf "
-from math import tau
-from numpy import nan
-from numpy import inf
+help_msg = bring(import_from='tqdm.auto', module_name='tqdm', help_msg=help_msg)
+help_msg = bring(module_name='time', help_msg=help_msg)
+help_msg = bring(import_from='math', module_name='tau', help_msg=help_msg)
+help_msg = bring(import_from='numpy', module_name='nan', help_msg=help_msg)
+help_msg = bring(import_from='numpy', module_name='inf', help_msg=help_msg)
+help_msg = bring(import_from='numpy', module_name='pi', help_msg=help_msg)
 
 # note that this will not work when not-in-jupyter
 try:
