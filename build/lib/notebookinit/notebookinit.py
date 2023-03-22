@@ -5,68 +5,42 @@ imports logging, numpy, pandas, e.t.c.
 
 usage:
 
-from std_init import *
+from notebookinit import *
 log=logging.getLogger('<your_region_name>')
 
-# then at the end (to be ran after "run all")
+# then at the end (to be run after "run all")
 
 print_watermark()
 save_notebook()
 
 """
 
-"""
-# install requirements:
 
-conda install -y mamba 
-alias mambao="mamba install --use-index-cache -y --channel conda-forge"
-python -m pip install -U git+https://github.com/jerzydziewierz/mict.git#egg=mict
-mambao jupyter ipython plotly numpy pandas cryptography jax python-kaleido tqdm watermark pymc3
-python -m pip install kaleido chevron
-# multiprocessing: 
-python -m pip install pqdm bounded-pool-executor
-
-"""
 help_msg = ""
 # do all the imports here to keep the dev file clean
 
+# ====================================  project folders setup
+help_msg += "Path "
+from pathlib import Path
+import os
+import sys
+import warnings
 
-def bring(import_from=None, module_name=None, import_as=None, help_msg="", verbose=False):
-    """
-    Import a module or a function from a module, to the caller's frame.
 
-    :param import_from: if not None, uses "from X import Y" semantics. Otherwise, it uses "Import X" semantics
-    :param module_name: name of the module to import.
-    :param import_as: if not None, adds "as Z" semantics. Otherwise, does nothing.
-    :param help_msg: running list of available modules, string.
-    :param verbose: if True, print the module name and the imported module.
-    :return: incremented _available_modules string. if "import_as" is used, the input _available_modules is incremented with "import_as" name; otherwise, it is incremented with `module_name` name.
-    """
-    import inspect
-    parent_locals = inspect.currentframe().f_back.f_locals
-    parent_globals = inspect.currentframe().f_back.f_globals
-    if import_from is None:
-        code_to_exec = f'import {module_name}'
-    else:
-        code_to_exec = f'from {import_from} import {module_name}'
-    if import_as is not None:
-        code_to_exec += f' as {import_as}'
-    success = False
-    try:
-        exec(code_to_exec, parent_globals, parent_locals)
-        success = True
-    except Exception as e:
-        if verbose:
-            print(f'failed to import {module_name}')
-            print(e)
-        else:
-            pass
-    if import_as is not None:
-        help_msg += f'{import_as} '
-    else:
-        help_msg += f'{module_name} '
+folder_project_root = str(Path(os.getcwd()).joinpath('../').resolve())
+folder_data = Path(os.getcwd() + '/../data/').resolve().__str__()
+folder_log = str(Path(folder_project_root).joinpath('log').resolve())
+Path(folder_log).mkdir(parents=True, exist_ok=True)
+# folder_reports = Path(os.getcwd() + '/../reports/raw/').resolve().__str__()
+# folder_cache = Path(os.getcwd() + '/../data/cache/').resolve().__str__()
+#
+#
+Path(folder_data).mkdir(parents=True, exist_ok=True)
+# Path(folder_reports).mkdir(parents=True, exist_ok=True)
+# Path(folder_cache).mkdir(parents=True, exist_ok=True)
 
-    return help_msg
+from .bring import bring
+
 
 
 # ==================================== start with the logger
@@ -81,7 +55,7 @@ help_msg += "now "
 
 # %(created)f - # that makes an unix epoch time
 log_fmt = '%(asctime)s | %(name)-6s | %(levelname)-5s | > %(message)s'
-logging.basicConfig(level=logging.INFO, format=log_fmt, filename=f'log_{Timestamp.utcnow().isoformat()[0:13]}.log',
+logging.basicConfig(level=logging.INFO, format=log_fmt, filename=f'{folder_log}/log_{Timestamp.utcnow().isoformat()[0:13]}.log',
                     filemode='a')  # ,datefmt="%Y-%m-%dT%H:%M:%S%z"
 
 console = logging.StreamHandler()
@@ -109,52 +83,37 @@ def make_log(section_name='unknown', verbose=False):
 help_msg += "nnlog "
 
 
-def nnlog(message='message unset', section=None, log=None, level=None):
+def nnlog(message='message unset', section=None, log=None, level=None, execute=True):
     """
     Shortcut: conditional logging
     :param message: message to log. If None, will say "message unset"
     :param section: section to log to. if None, will get the caller's name.
     :param log: log to this logger. if None, will make new logger.
     :param level: log level. if None, will use logging.DEBUG (which is quite low)
+    :param execute: if false, do nothing. default true.
     :return: nothing.
     """
+    if execute:
+        if section is None:
+            import inspect
+            section = inspect.stack()[1][3]
 
-    if section is None:
-        import inspect
-        section = inspect.stack()[1][3]
+        if log is None:
+            _log = make_log(section_name=section)
+        else:
+            _log = log
 
-    if log is None:
-        _log = make_log(section_name=section)
-    else:
-        _log = log
-
-    if _log is not None:
-        if level is None:
-            level = logging.DEBUG
-        _log.log(level, message)
+        if _log is not None:
+            if level is None:
+                level = logging.DEBUG
+            _log.log(level, message)
 
 
 del console
 del formatter
 del log_fmt
 
-help_msg += "Obsolete "
-
-
-class Obsolete(Exception):
-    def __init__(self, use_instead=None):
-        import inspect
-        caller = inspect.stack()[1]
-        caller_fn_name = caller.function
-        caller_file = caller.filename
-        # print(caller)
-        if use_instead is not None:
-            message = f"function >>{caller_fn_name}<< from {caller_file} is obsolete. Use {use_instead} instead."
-        else:
-            message = f">{caller_fn_name}< from {caller_file} is obsolete."
-        super().__init__(message)
-
-    pass
+bring(import_from='notebookinit.obsolete', module_name='Obsolete', help_msg=help_msg, verbose=False)
 
 
 help_msg += "print_watermark "
@@ -200,7 +159,7 @@ def add_path(new_lib_path=None, verbose=False):
     """
     if new_lib_path is not None:
         if new_lib_path not in sys.path:
-            sys.path.append(new_lib_path)
+            sys.path.append(str(new_lib_path))
     if verbose:
         print(sys.path)
 
@@ -320,19 +279,23 @@ def get_notebook_name2():
     import re
     import ipykernel
     import requests
+    try:
+        from urllib.parse import urljoin
+        from notebook.notebookapp import list_running_servers
 
-    from urllib.parse import urljoin
-    from notebook.notebookapp import list_running_servers
-    kernel_id = re.search('kernel-(.*).json',
-                          ipykernel.connect.get_connection_file()).group(1)
-    servers = list_running_servers()
-    for ss in servers:
-        response = requests.get(urljoin(ss['url'], 'api/sessions'),
-                                params={'token': ss.get('token', '')})
-        for nn in json.loads(response.text):
-            if nn['kernel']['id'] == kernel_id:
-                relative_path = nn['notebook']['path']
-                return os.path.join(ss['notebook_dir'], relative_path)
+        kernel_id = re.search('kernel-(.*).json',
+                              ipykernel.connect.get_connection_file()).group(1)
+        servers = list_running_servers()
+        for ss in servers:
+            response = requests.get(urljoin(ss['url'], 'api/sessions'),
+                                    params={'token': ss.get('token', '')})
+            for nn in json.loads(response.text):
+                if nn['kernel']['id'] == kernel_id:
+                    relative_path = nn['notebook']['path']
+                    return os.path.join(ss['notebook_dir'], relative_path)
+    except RuntimeError as e:
+        warnings.warn(e.args[0])
+        return None
 
 
 def save_notebook(notebook_name=None,
@@ -363,22 +326,20 @@ def save_notebook(notebook_name=None,
         IPython.display.display(IPython.display.Javascript('IPython.notebook.save_checkpoint();'))
 
     if git_message is not None:
+        log.info(f'commiting with git...')
         run_with_shell(f'nbdev_clean --clear_all --fname {nb_full_path}')
         run_with_shell('git add .')
         run_with_shell(f'git commit -a -m "{git_message}"')
         run_with_shell('git push')
+        log.info('git push done')
 
 
 log = make_log('notebookinit')
 
 # ====================================  add project root to path
-help_msg += "Path "
-from pathlib import Path
+
 Path('log').mkdir(parents=True, exist_ok=True)
 log = make_log('notebookinit')
-import os
-import sys
-import warnings
 
 help_msg += "warn "
 from warnings import warn
@@ -404,6 +365,7 @@ help_msg = bring(module_name='json', help_msg=help_msg)
 help_msg = bring(module_name='pint', help_msg=help_msg)
 help_msg = bring(module_name='uncertanities', help_msg=help_msg)
 help_msg = bring(module_name='pydantic', help_msg=help_msg)
+help_msg = bring(import_from='retry', module_name='retry', help_msg=help_msg)
 
 
 try:
@@ -426,14 +388,12 @@ except ImportError:
 from IPython.display import display, HTML
 
 
-help_msg += "tqdm "
-from tqdm.auto import tqdm
-import time
-
-help_msg += "tau, nan, inf "
-from math import tau
-from numpy import nan
-from numpy import inf
+help_msg = bring(import_from='tqdm.auto', module_name='tqdm', help_msg=help_msg)
+help_msg = bring(module_name='time', help_msg=help_msg)
+help_msg = bring(import_from='math', module_name='tau', help_msg=help_msg)
+help_msg = bring(import_from='numpy', module_name='nan', help_msg=help_msg)
+help_msg = bring(import_from='numpy', module_name='inf', help_msg=help_msg)
+help_msg = bring(import_from='numpy', module_name='pi', help_msg=help_msg)
 
 # note that this will not work when not-in-jupyter
 try:
@@ -442,17 +402,7 @@ except Exception:
     print('possibly non-jupyter env detected.')
 
 
-# ====================================  project folders setup
 
-folder_project_root = str(Path(os.getcwd()).joinpath('../').resolve())
-folder_data = Path(os.getcwd() + '/../data/').resolve().__str__()
-# folder_reports = Path(os.getcwd() + '/../reports/raw/').resolve().__str__()
-# folder_cache = Path(os.getcwd() + '/../data/cache/').resolve().__str__()
-#
-#
-Path(folder_data).mkdir(parents=True, exist_ok=True)
-# Path(folder_reports).mkdir(parents=True, exist_ok=True)
-# Path(folder_cache).mkdir(parents=True, exist_ok=True)
 
 import dotenv
 #
@@ -464,7 +414,7 @@ if len(passwords) > 0:
 welcome_text = f''
 welcome_text += f''
 # welcome_text += f'{folder_project_root=}\n{folder_data=}\n{folder_reports=}\n{folder_cache=}\n'
-welcome_text += f'{folder_project_root=}\n'
+welcome_text += f'folder_project_root={folder_project_root}\n'
 welcome_text += f'{help_msg}\n'
 welcome_text += f'Have a productive day!'
 log.info(welcome_text)
