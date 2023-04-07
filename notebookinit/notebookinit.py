@@ -27,7 +27,10 @@ import sys
 import warnings
 
 
-folder_project_root = str(Path(os.getcwd()).joinpath('../').resolve())
+# version with root folder being above the current folder:
+# folder_project_root = str(Path(os.getcwd()).joinpath('../').resolve())
+# version with root folder being the current folder:
+folder_project_root = str(Path(os.getcwd()).resolve())
 folder_data = Path(os.getcwd() + '/../data/').resolve().__str__()
 folder_log = str(Path(folder_project_root).joinpath('log').resolve())
 Path(folder_log).mkdir(parents=True, exist_ok=True)
@@ -40,7 +43,6 @@ Path(folder_data).mkdir(parents=True, exist_ok=True)
 # Path(folder_cache).mkdir(parents=True, exist_ok=True)
 
 from .bring import bring
-
 
 
 # ==================================== start with the logger
@@ -77,7 +79,7 @@ def make_log(section_name='unknown', verbose=False):
             print(f'logging to {_log.parent.handlers[0].stream.name}')
     except:
         pass
-    return _log
+    return _log.info
 
 
 help_msg += "nnlog "
