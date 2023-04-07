@@ -66,9 +66,10 @@ formatter = logging.Formatter('%(name)-5s| %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 
+
 def make_log(section_name='unknown', verbose=False):
     """ shortcut to get global program logger with local section name.
-    Make the section name 6 characters or less, please.
+    Make the section name 6 characters or fewer, please.
     :param section_name:
     :param verbose: if True, print the section name.
     :return:
@@ -154,6 +155,7 @@ def run_with_shell(command):
 
 
 help_msg += "add_path "
+
 
 def add_path(new_lib_path=None, verbose=False):
     """
@@ -402,7 +404,6 @@ try:
     ipython.magic('load_ext autoreload')
 except Exception:
     print('possibly non-jupyter env detected.')
-
 
 
 

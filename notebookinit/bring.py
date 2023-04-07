@@ -1,3 +1,10 @@
+"""bring.py
+
+This module contains the bring() function, which is used to import modules into the caller's frame.
+
+"""
+
+
 def bring(import_from=None, module_name=None, import_as=None, help_msg="", verbose=False, levels=1):
     """
     Import a module or a function from a module, to the caller's frame.
