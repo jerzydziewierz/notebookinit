@@ -372,16 +372,18 @@ help_msg = bring(module_name='pydantic', help_msg=help_msg)
 help_msg = bring(import_from='retry', module_name='retry', help_msg=help_msg)
 
 
-# try:
-#     import jax
-#     jax.config.update('jax_platform_name', 'cpu')
-#     jax.config.update('jax_platforms', 'cpu')
-#     jax.config.update('jax_enable_x64', True)
-#     jax.config.update('jax_default_dtype_bits', 32)
-#     jax.numpy.arange(10)
-#     help_msg += "jax, "
-# except ImportError:
-#     pass
+try:
+    import jax
+    jax.config.update('jax_platform_name', 'cpu')
+    jax.config.update('jax_platforms', 'cpu')
+    jax.config.update('jax_enable_x64', True)
+    jax.config.update('jax_default_dtype_bits', 32)
+    jax.numpy.arange(10)
+    help_msg += "jax, "
+except ImportError:
+    pass
+except AttributeError:
+    print('could not import jax')
 
 try:
     import chevron
