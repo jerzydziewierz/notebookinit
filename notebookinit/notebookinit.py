@@ -338,8 +338,6 @@ def save_notebook(notebook_name=None,
         log.info('git push done')
 
 
-log = make_log('notebookinit')
-
 # ====================================  add project root to path
 
 Path('log').mkdir(parents=True, exist_ok=True)
@@ -422,7 +420,7 @@ welcome_text += f''
 welcome_text += f'folder_project_root={folder_project_root}\n'
 welcome_text += f'{help_msg}\n'
 welcome_text += f'Have a productive day!'
-log.info(welcome_text)
+log(welcome_text)
 
 del welcome_text
 del help_msg
